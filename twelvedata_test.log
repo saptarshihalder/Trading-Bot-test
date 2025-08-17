@@ -1,9 +1,0 @@
-2025-08-16 21:17:08,684 - INFO - --- Data Ingestion Script Started ---
-2025-08-16 21:17:08,684 - INFO - Initializing DataIngestor.
-2025-08-16 21:17:08,687 - INFO - Configuration loaded successfully.
-2025-08-16 21:17:08,688 - INFO - Attempting to connect to Twelve Data WebSocket...
-2025-08-16 21:17:09,006 - INFO - WebSocket connection established successfully.
-2025-08-16 21:17:09,007 - INFO - Sending subscription message: {'action': 'subscribe', 'params': {'symbols': 'AAPL'}}
-2025-08-16 21:17:09,007 - INFO - Subscription message sent for AAPL.
-2025-08-16 21:17:09,007 - INFO - Starting to stream live data... (Waiting for messages)
-2025-08-16 21:17:09,133 - INFO - Processed message for symbol None

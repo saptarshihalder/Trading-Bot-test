@@ -1,45 +1,77 @@
 import logging
+import yaml
+import alpaca_trade_api as tradeapi
+import os
 
 logger = logging.getLogger(__name__)
 
 class OrderManagementSystem:
     """
-    A placeholder for the Order Management System (OMS).
+    The Order Management System (OMS) for connecting to Alpaca.
 
-    In a real trading bot, this component would be responsible for:
-    - Managing the lifecycle of orders (sending, cancelling, updating).
-    - Tracking order status (pending, filled, cancelled).
-    - Communicating with the brokerage's API.
-
-    For now, this is a mock implementation that just logs any orders it's
-    asked to execute.
+    This component is responsible for executing trades via the Alpaca API.
     """
-    def __init__(self):
-        logger.info("Initializing OrderManagementSystem (Mock).")
+    def __init__(self, config_path='config/config.yml'):
+        logger.info("Initializing OrderManagementSystem for Alpaca.")
+        try:
+            self._config = self._load_config(config_path)
+            alpaca_config = self._config['alpaca']
 
-    async def execute_order(self, symbol: str, quantity: float, order_type: str = "MARKET"):
+            # Ensure the API keys are not empty
+            if not alpaca_config['key_id'] or not alpaca_config['secret_key']:
+                raise ValueError("Alpaca API Key ID and Secret Key cannot be empty.")
+
+            self.api = tradeapi.REST(
+                key_id=alpaca_config['key_id'],
+                secret_key=alpaca_config['secret_key'],
+                base_url=alpaca_config['base_url'],
+                api_version='v2'
+            )
+            # Verify the connection by fetching account information
+            account = self.api.get_account()
+            logger.info(f"Successfully connected to Alpaca. Account Status: {account.status}")
+            logger.info(f"Paper Trading Account: {account.paper_trading}")
+
+        except Exception as e:
+            logger.exception("Failed to initialize Alpaca OMS. Check API keys and config.")
+            # Re-raise the exception to halt initialization if OMS fails
+            raise e
+
+    def _load_config(self, path):
+        """Loads the YAML configuration file."""
+        logger.debug(f"Loading config from path: {path}")
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Config file not found at {path}")
+        with open(path, 'r') as f:
+            return yaml.safe_load(f)
+
+    async def execute_order(self, symbol: str, qty: float, side: str, order_type: str = 'market', time_in_force: str = 'day'):
         """
-        Receives an order from a strategy and 'executes' it by logging it.
-        This is a simplified, direct-call method for now. A more advanced
-        system would use OrderEvents and a dedicated order execution queue.
+        Submits an order to the Alpaca API.
 
         Args:
-            symbol: The symbol to trade (e.g., 'AAPL').
-            quantity: The amount to trade. Positive for buy, negative for sell.
-            order_type: The type of order (e.g., 'MARKET', 'LIMIT').
+            symbol (str): The symbol to trade.
+            qty (float): The number of shares to trade. Must be positive.
+            side (str): 'buy' or 'sell'.
+            order_type (str): 'market', 'limit', 'stop', etc.
+            time_in_force (str): 'day', 'gtc', 'opg', etc.
+
+        Returns:
+            The order object from Alpaca if successful, otherwise None.
         """
-        # In a real system, this would generate an OrderEvent and send it to the brokerage.
-        # For now, we just log the action to show it was called.
-        logger.info(
-            f"--> OMS received order to execute: "
-            f"Type={order_type}, Symbol={symbol}, Quantity={quantity}"
-        )
-
-        # We can also print to the console for more obvious feedback during testing.
-        print(
-            f"--- MOCK OMS: Pretending to execute {order_type} order "
-            f"for {quantity} of {symbol} ---"
-        )
-
-        # A real OMS would return a unique order ID for tracking.
-        return "mock_order_id_12345"
+        logger.info(f"Submitting {side} order for {qty} shares of {symbol} to Alpaca.")
+        try:
+            # Alpaca API expects qty to be a positive number.
+            order = self.api.submit_order(
+                symbol=symbol,
+                qty=abs(float(qty)),
+                side=side,
+                type=order_type,
+                time_in_force=time_in_force
+            )
+            logger.info(f"Successfully submitted order to Alpaca. Order ID: {order.id}, Status: {order.status}")
+            print(f"--- REAL OMS: Submitted {side} order for {qty} of {symbol} to Alpaca. Order ID: {order.id} ---")
+            return order
+        except Exception:
+            logger.exception(f"Failed to submit order for {symbol} to Alpaca.")
+            return None

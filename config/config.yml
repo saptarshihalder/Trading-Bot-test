@@ -14,6 +14,7 @@ trading:
 api_keys:
   polygon: "03K2EUNKIwZgbybo_ixWPVjMeepI6Jda"
   twelvedata: "c91cab3dc08d4b4fab060f28e54ac05b"
+  # Note: Alpaca keys are stored in their own section below.
 
 # Polygon.io specific settings
 polygon:
@@ -22,3 +23,17 @@ polygon:
 # Twelve Data specific settings
 twelvedata:
   stream_url: "wss://ws.twelvedata.com/v1/quotes/price"
+
+# ----------------- Brokerage Settings -----------------
+# This section defines the brokerage to be used for executing trades.
+
+brokerage:
+  # Select the active brokerage. Options: 'alpaca'
+  active: "alpaca"
+
+# Alpaca specific settings
+alpaca:
+  # The API endpoint for paper trading.
+  base_url: "https://paper-api.alpaca.markets"
+  key_id: "CK876LUSI6SEKSRRNAJ1"
+  secret_key: "IaADoyBMsm3hSNgFHVaPNsHlcuU3nS1LQCgTxj6E"

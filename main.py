@@ -5,7 +5,7 @@ import os
 # --- Import all the components ---
 from trading_bot.data_ingestion import DataIngestor
 from trading_bot.event_engine import EventEngine
-from trading_bot.strategy import LoggingStrategy
+from trading_bot.strategies.simple_buy import SimpleBuyStrategy
 from trading_bot.oms import OrderManagementSystem
 
 def setup_logging():
@@ -47,18 +47,16 @@ async def main():
     logging.info("--- Trading Bot Application Starting ---")
 
     # 1. Initialize all the main components of the system
+    # OMS must be initialized first, as it's passed to the strategy.
     event_engine = EventEngine()
     data_ingestor = DataIngestor()
-    strategy = LoggingStrategy()
-    oms = OrderManagementSystem() # The strategy will need a reference to this if it places orders
+    oms = OrderManagementSystem()
+    strategy = SimpleBuyStrategy(oms=oms)
 
     # 2. Wire the components together. This is the core of the setup.
     # The EventEngine needs to know which methods to call for each event type.
     # Here, we tell it that for every 'QuoteEvent', it should call the 'on_quote' method of our strategy instance.
     event_engine.register_handler('QuoteEvent', strategy.on_quote)
-
-    # In a real strategy, we would pass the OMS to the strategy so it can execute orders.
-    # e.g., setattr(strategy, 'oms', oms)
 
     # 3. Create and run the main concurrent tasks
     # We need to run the data ingestor (which produces events) and the event engine
