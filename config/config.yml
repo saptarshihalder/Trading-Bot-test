@@ -1,0 +1,24 @@
+# Configuration for the Trading Bot
+
+# Data source settings
+# Select the data source to use. Options: 'polygon', 'twelvedata'
+data_source:
+  active: "twelvedata"
+
+# Trading settings
+trading:
+  # Using a stock ticker appropriate for Twelve Data.
+  symbol: "AAPL"
+
+# API Keys
+api_keys:
+  polygon: "03K2EUNKIwZgbybo_ixWPVjMeepI6Jda"
+  twelvedata: "c91cab3dc08d4b4fab060f28e54ac05b"
+
+# Polygon.io specific settings
+polygon:
+  stream_url: "wss://socket.polygon.io/crypto"
+
+# Twelve Data specific settings
+twelvedata:
+  stream_url: "wss://ws.twelvedata.com/v1/quotes/price"

@@ -1,0 +1,5 @@
+Connecting to wss://socket.polygon.io/stocks...
+Authentication message sent.
+Server response: [{"ev":"status","status":"connected","message":"Connected Successfully"}]
+Server response: [{"ev":"status","status":"auth_failed","message":"Your plan doesn't include websocket access. Visit https://polygon.io/pricing to upgrade."}]
+Authentication failed. Check API key and permissions.

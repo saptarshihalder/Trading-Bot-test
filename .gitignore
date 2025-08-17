@@ -1,0 +1,28 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+venv/
+env/
+
+# Log files
+*.log
+debug.log
+ingestion_test.log
+polygon_test.log
+polygon_crypto_test.log
+twelvedata_test.log
+main_run.log
+
+# IDE / Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
