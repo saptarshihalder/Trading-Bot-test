@@ -17,13 +17,14 @@ class OrderManagementSystem:
             self._config = self._load_config(config_path)
             alpaca_config = self._config['alpaca']
 
-            # Ensure the API keys are not empty
-            if not alpaca_config['key_id'] or not alpaca_config['secret_key']:
-                raise ValueError("Alpaca API Key ID and Secret Key cannot be empty.")
+            key_id = os.environ.get('ALPACA_KEY_ID')
+            secret_key = os.environ.get('ALPACA_SECRET_KEY')
+            if not key_id or not secret_key:
+                raise ValueError("ALPACA_KEY_ID and ALPACA_SECRET_KEY environment variables must be set")
 
             self.api = tradeapi.REST(
-                key_id=alpaca_config['key_id'],
-                secret_key=alpaca_config['secret_key'],
+                key_id=key_id,
+                secret_key=secret_key,
                 base_url=alpaca_config['base_url'],
                 api_version='v2'
             )

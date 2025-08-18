@@ -10,12 +10,6 @@ trading:
   # Using a stock ticker appropriate for Twelve Data.
   symbol: "AAPL"
 
-# API Keys
-api_keys:
-  polygon: "03K2EUNKIwZgbybo_ixWPVjMeepI6Jda"
-  twelvedata: "c91cab3dc08d4b4fab060f28e54ac05b"
-  # Note: Alpaca keys are stored in their own section below.
-
 # Polygon.io specific settings
 polygon:
   stream_url: "wss://socket.polygon.io/crypto"
@@ -35,5 +29,3 @@ brokerage:
 alpaca:
   # The API endpoint for paper trading.
   base_url: "https://paper-api.alpaca.markets"
-  key_id: "CK876LUSI6SEKSRRNAJ1"
-  secret_key: "IaADoyBMsm3hSNgFHVaPNsHlcuU3nS1LQCgTxj6E"
