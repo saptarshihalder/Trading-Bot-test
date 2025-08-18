@@ -43,10 +43,26 @@ class EventEngine:
 
                 if event.type in self._handlers:
                     for handler in self._handlers[event.type]:
-                        # Run the handler as a non-blocking background task.
-                        # This prevents a slow strategy from blocking the entire event loop.
-                        asyncio.create_task(handler(event))
+                        # Run the handler without blocking the main event loop.
+                        #
+                        # Handlers may be defined either as ``async`` coroutines or as
+                        # regular synchronous callables.  ``asyncio.create_task`` requires
+                        # a coroutine object and would raise a ``TypeError`` if a regular
+                        # function were provided.  To support both styles we inspect the
+                        # handler and schedule it appropriately:
+                        loop = asyncio.get_running_loop()
+                        if asyncio.iscoroutinefunction(handler):
+                            loop.create_task(handler(event))
+                        else:
+                            # Execute synchronous handlers immediately. These handlers are
+                            # expected to be lightweight; heavier work should be implemented
+                            # using ``async`` coroutines.
+                            handler(event)
 
                 event_queue.task_done()
+            except asyncio.CancelledError:
+                # Gracefully exit if the event loop or task is cancelled.
+                logger.info("Event engine run task cancelled. Shutting down event loop.")
+                break
             except Exception:
                 logger.exception("An error occurred in the event engine's main loop.")
