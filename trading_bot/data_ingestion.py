@@ -19,12 +19,15 @@ class DataIngestor:
         try:
             self._config = self._load_config(config_path)
             # This is a bit rigid, a factory pattern would be better for multiple sources
-            self._api_key = self._config['api_keys']['twelvedata']
+            self._api_key = os.environ.get('TWELVEDATA_API_KEY')
+            if not self._api_key:
+                raise ValueError("TWELVEDATA_API_KEY environment variable not set")
             self._base_url = self._config['twelvedata']['stream_url']
             self._symbol = self._config['trading']['symbol']
-            self._stream_url = f"{self._base_url}?apikey={self._api_key}"
+            self._stream_url = self._base_url
+            self._headers = {'Authorization': f'Bearer {self._api_key}'}
             logger.info("Configuration loaded for Twelve Data.")
-            logger.debug(f"Stream URL: {self._base_url}?apikey=...{self._api_key[-4:]}")
+            logger.debug(f"Stream URL: {self._base_url}")
         except Exception:
             logger.exception("Failed to initialize DataIngestor. Check config file.")
             raise
@@ -40,7 +43,7 @@ class DataIngestor:
         """
         logger.info("DataIngestor starting connection...")
         try:
-            async with websockets.connect(self._stream_url) as websocket:
+            async with websockets.connect(self._stream_url, extra_headers=self._headers) as websocket:
                 logger.info("WebSocket connection established.")
                 subscribe_message = {
                     "action": "subscribe",
